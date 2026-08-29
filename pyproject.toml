@@ -1,0 +1,32 @@
+[project]
+name = "production-rag-1"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Shashank Chikattimala", email = "shashankcm90@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.141.1",
+    "langchain-anthropic>=1.7.0",
+    "langgraph>=1.2.11",
+    "langsmith>=0.11.2",
+    "pydantic-settings>=2.15.0",
+    "python-dotenv>=1.2.3",
+    "slowapi>=0.1.10",
+    "uvicorn>=0.52.4",
+]
+
+[project.scripts]
+production-rag-1 = "production_rag_1:main"
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+]
