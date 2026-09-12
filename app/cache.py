@@ -21,7 +21,7 @@ class ResponseCache:
         self._ttl = ttl_seconds
         self._cache: dict[str, dict] = {}
         self._hits = 0
-        self.__misses = 0
+        self._misses = 0
 
     def _make_key(self, query: str) -> str:
         """Generate a cache key for the normalized query."""
@@ -36,7 +36,7 @@ class ResponseCache:
 
         key = self._make_key(query)
 
-        if key not in self._cache:
+        if key in self._cache:
             entry = self._cache[key]
             if time.time() - entry["timestamp"] < self._ttl:
                 self._hits += 1

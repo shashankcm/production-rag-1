@@ -71,6 +71,7 @@ class MetricsCollector:
         input_tokens: int = 0,
         output_tokens: int = 0,
         cache_hit: bool = False,
+        error: bool = False,
     ):
         """Record a request with the given metrics."""
         self.metrics["requests_total"] += 1
@@ -79,13 +80,13 @@ class MetricsCollector:
         self.metrics["token_input"] += input_tokens
         self.metrics["token_output"] += output_tokens
 
-        if error:
-            self.metrics["errors_total"] += 1
-
         if cache_hit:
             self.metrics["cache_hits"] += 1
         else:
             self.metrics["cache_misses"] += 1
+
+        if error:
+            self.metrics["errors_total"] += 1
 
     def get_summary(self) -> dict:
         avg_latency = (
@@ -110,7 +111,7 @@ class MetricsCollector:
             "total_errors": self.metrics["errors_total"],
             "error_rate": f"{error_rate:.2%}",
             "avg_latency_ms": round(avg_latency, 2),
-            "total_input_tokens": self.metrics["tokens_input"],
-            "total_output_tokens": self.metrics["tokens_output"],
+            "total_input_tokens": self.metrics["token_input"],
+            "total_output_tokens": self.metrics["token_output"],
             "cache_hit_rate": f"{cache_hit_rate:.2%}",
         }

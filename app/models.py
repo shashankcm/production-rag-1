@@ -6,6 +6,7 @@ Pydantic models for input validation and output serialization.
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field
+from slowapi.extension import Dict
 
 
 class ChatRequest(BaseModel):
@@ -24,12 +25,13 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     """Response model for chat endpoint."""
 
-    response: str
+    response: Dict | str
     thread_id: str
     model_used: str
     cached: bool
-    processing_time: float
+    processing_time_ms: float
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    security_notes: list[str] | None = None
 
 
 class HealthResponse(BaseModel):
@@ -48,7 +50,7 @@ class MetricsResponse(BaseModel):
     total_errors: int = Field(default=0)
     error_rate: str = Field(default="")
     avg_latency_ms: float = Field(default=0.0)
-    cache_hit_rate: int = Field(default=0)
+    cache_hit_rate: str = Field(default="")
     total_input_tokens: int = Field(default=0)
     total_output_tokens: int = Field(default=0)
 
