@@ -5,7 +5,6 @@ Protecting LLM applications in production
 
 import re
 from typing import Optional
-from warnings import warn
 
 from langsmith import traceable
 from pydantic_settings.main import T
