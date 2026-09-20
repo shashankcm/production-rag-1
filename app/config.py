@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     # LangSmith Configuration
     langchain_api_key: str = ""
     langchain_tracing_v2: bool = True
-    langchain_project: str = "proeuction-rag-1"
+    langchain_project: str = "production-rag-1"
 
     # Application Configuration
     app_env: str = "development"
