@@ -23,10 +23,12 @@ services:
             value: gpt-4o-mini
           - key: FALLBACK_MODEL
             value: gpt-4o-mini
+          # Secrets: sync: false makes Render ask for the value in its dashboard.
+          # (value: false would set the variable to the literal string "false".)
           - key: OPENAI_API_KEY
-            value: false
+            sync: false
           - key: LANGCHAIN_API_KEY
-            value: false
+            sync: false
           - key: LANGCHAIN_TRACING_V2
             value: "true"
           - key: LANGCHAIN_PROJECT
