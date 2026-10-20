@@ -87,12 +87,17 @@ class ProductionRAGAgent:
                 }
 
         def handle_error(state: AgentState) -> dict:
-            """Handles errors and decides whether to retry or fallback."""
+            """
+            Ends the run after every attempt has failed.
+
+            The error stays in the state so the caller can tell a failure from an answer. The
+            message is generic because the exception text can contain keys or hostnames.
+            """
             return {
-                "messages": [AIMessage(content=f"Error: {state['error']}")],
-                "error": None,
+                "messages": [AIMessage(content="The service could not complete your request.")],
+                "error": state["error"],
                 "retry_count": 0,
-                "model_used": "primary",
+                "model_used": state["model_used"],
             }
 
         def route_after_process(state: AgentState) -> str:
@@ -126,8 +131,12 @@ class ProductionRAGAgent:
             route_after_process,
             {"done": END, "fallback": "fallback", "error": "error"},
         )
+        # route_after_fallback returns "fallback" to retry; without this entry LangGraph raises
+        # KeyError: 'fallback' the second time the fallback model fails.
         graph.add_conditional_edges(
-            "fallback", route_after_fallback, {"done": END, "error": "error"}
+            "fallback",
+            route_after_fallback,
+            {"done": END, "fallback": "fallback", "error": "error"},
         )
 
         graph.add_edge("error", END)

@@ -180,7 +180,29 @@ async def chat_endpoint(request: Request, body: ChatRequest):
                 },
             )
             metrics.record_request(latency_ms=0, error=True)
-            raise HTTPException(status_code=500, detail=str(e))
+            # The full error is logged above. The caller gets a generic message, because the
+            # exception text can contain hostnames, connection strings or credentials.
+            raise HTTPException(
+                status_code=500, detail="Internal error while processing your request"
+            )
+
+        # The agent reports "every model failed" through its error field. That is not an answer:
+        # return 503 and do not cache it, or the failure would be served until the TTL expires.
+        if result.get("error"):
+            logger.error(
+                f"Agent could not produce an answer: {result['error']}",
+                extra={
+                    "extra_data": {
+                        "message": cleaned_message,
+                        "thread_id": body.thread_id,
+                        "error": result["error"],
+                    }
+                },
+            )
+            metrics.record_request(latency_ms=0, error=True)
+            raise HTTPException(
+                status_code=503, detail="The language model is currently unavailable"
+            )
 
         response_text = result["response"]
         model_used = result["model_used"]
