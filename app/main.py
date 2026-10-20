@@ -180,7 +180,11 @@ async def chat_endpoint(request: Request, body: ChatRequest):
                 },
             )
             metrics.record_request(latency_ms=0, error=True)
-            raise HTTPException(status_code=500, detail=str(e))
+            # The full error is logged above. The caller gets a generic message, because the
+            # exception text can contain hostnames, connection strings or credentials.
+            raise HTTPException(
+                status_code=500, detail="Internal error while processing your request"
+            )
 
         response_text = result["response"]
         model_used = result["model_used"]

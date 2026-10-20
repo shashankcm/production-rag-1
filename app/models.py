@@ -4,9 +4,9 @@ Pydantic models for input validation and output serialization.
 """
 
 from datetime import datetime, timezone
+from typing import Dict
 
 from pydantic import BaseModel, Field
-from slowapi.extension import Dict
 
 
 class ChatRequest(BaseModel):

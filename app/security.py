@@ -7,7 +7,6 @@ import re
 from typing import Optional
 
 from langsmith import traceable
-from pydantic_settings.main import T
 
 
 class InputSanitizer:
