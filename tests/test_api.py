@@ -114,6 +114,26 @@ def test_an_agent_failure_returns_500_without_leaking_the_internal_error(client)
     assert "hunter2" not in response.text
 
 
+def test_a_model_failure_is_a_503_without_internal_text_and_is_not_cached(client):
+    # The agent reports "every model failed" through its error field, not by raising.
+    FakeAgent.reply = {
+        "response": "The service could not complete your request.",
+        "model_used": "secondary",
+        "error": "401 invalid api key sk-secret",
+    }
+    failed = chat(client, "What is a pod?")
+
+    assert failed.status_code == 503
+    assert "sk-secret" not in failed.text
+
+    FakeAgent.reply = {"response": "A pod is the smallest deployable unit.", "model_used": "primary", "error": None}
+    recovered = chat(client, "What is a pod?")
+
+    assert recovered.status_code == 200
+    assert recovered.json()["cached"] is False  # the failure was not stored
+    assert len(FakeAgent.calls) == 2
+
+
 def test_the_twenty_first_request_in_a_minute_is_rate_limited(client):
     statuses = [chat(client, "What is a pod?").status_code for _ in range(21)]
 
